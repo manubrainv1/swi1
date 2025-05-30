@@ -1,160 +1,119 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<title>Gerador de Link WhatsApp</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-:root{
-  --radius:12px;
-  --primary:#6366f1;
-  --primary-hov:#5254e1;
-  --bg:transparent;
-  --card:transparent;
-  --text:#1f2937;
-  --muted:#6b7280;
-  --code:#f1f5f9;
-  --border:#e5e7eb;
-}
-*{box-sizing:border-box;margin:0;padding:0;font-family:Inter,sans-serif}
-body{
-  background:var(--bg);color:var(--text);
-  min-height:100vh;display:flex;align-items:center;justify-content:center;
-  padding:24px;
-}
-.card{
-  background:var(--card);
-  width:100%;max-width:460px;
-  padding:32px;border-radius:var(--radius);
-  box-shadow:0 6px 18px rgba(0,0,0,.06);
-}
-@media(max-width:480px){
-  .card{padding:24px 18px;box-shadow:none;border-radius:0}
-}
-h1{text-align:center;font-size:1.35rem;font-weight:600;margin-bottom:26px}
-.row{margin-bottom:20px}
-.f-input{position:relative;width:100%}
-.f-input input,
-.f-input select{
-  width:100%;padding:14px 12px;font-size:1rem;
-  border:1px solid var(--border);border-radius:var(--radius);
-  transition:.18s;color:var(--text);background:#fff
-}
-.f-input input:focus,
-.f-input select:focus{
-  border-color:var(--primary);outline:none;background:rgba(99,102,241,.06)
-}
-.f-input label{
-  position:absolute;left:12px;top:50%;transform:translateY(-50%);
-  font-size:.88rem;color:var(--muted);pointer-events:none;transition:.18s
-}
-.f-input input:focus+label,
-.f-input input:not(:placeholder-shown)+label,
-.f-input select:focus+label,
-.f-input select:not([value=""])+label{
-  top:6px;font-size:.72rem;color:var(--primary)
-}
-.btn{
-  padding:11px 20px;font-weight:600;font-size:.9rem;color:#fff;
-  background:var(--primary);border:none;border-radius:var(--radius);
-  transition:.18s;cursor:pointer
-}
-.btn:hover{background:var(--primary-hov)}
-.btn:active{transform:scale(.96)}
-.btn:disabled{opacity:.45;cursor:default}
-#resultado{
-  background:var(--code);white-space:pre-wrap;padding:18px;border-radius:var(--radius);
-  margin-top:10px;font-family:"Courier New",monospace;font-size:.9rem;
-  opacity:0;transform:translateY(6px);transition:.25s
-}
-#resultado.show{opacity:1;transform:translateY(0)}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gerador de Link WhatsApp + swiy.io</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f6f6f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: white;
+      padding: 30px 40px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 100%;
+      max-width: 400px;
+    }
+    h1 {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+    select, input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      font-size: 14px;
+    }
+    button {
+      background-color: #5e4bdb;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:disabled {
+      background-color: #aaa;
+    }
+    #resultado {
+      background-color: #f1f1f1;
+      margin-top: 10px;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 13px;
+      border-radius: 5px;
+    }
+  </style>
 </head>
 <body>
-
-<div class="card">
-  <h1>Gerador de Link<br>WhatsApp + swiy.io</h1>
-
-  <div class="row">
-    <div class="f-input">
-      <select id="numero" placeholder=" ">
-        <option value="">Selecione uma conta</option>
-        <option value="5524981431724">Excellence Dental Academy</option>
-        <option value="5524981530500">Manu Arango</option>
-        <option value="5524981530501">Facial Academy</option>
-        <option value="5524981523330">Optical</option>
-      </select>
-      <label for="numero">Número de telefone</label>
-    </div>
+  <div class="container">
+    <h1>Gerador de Link <br> WhatsApp + swiy.io</h1>
+    <select id="numero">
+      <option value="">Número de telefone</option>
+      <option value="5524981431724">Excellence Dental Academy</option>
+      <option value="5524981530500">Manu Arango</option>
+      <option value="5524981530501">Facial Academy</option>
+      <option value="5524981523330">Optical</option>
+    </select>
+    <input type="text" id="mensagem" placeholder="Mensagem personalizada"/>
+    <input type="text" id="slug" placeholder="Slug personalizado"/>
+    <button id="gerar">Gerar</button>
+    <button id="copiar" disabled>Copiar</button>
+    <div id="resultado"></div>
   </div>
 
-  <div class="row">
-    <div class="f-input">
-      <input id="mensagem" type="text" placeholder=" " />
-      <label for="mensagem">Mensagem personalizada</label>
-    </div>
-  </div>
+  <script>
+    const gerar = document.getElementById('gerar');
+    const copiar = document.getElementById('copiar');
+    const resultado = document.getElementById('resultado');
 
-  <div class="row">
-    <div class="f-input">
-      <input id="slug" type="text" placeholder=" " />
-      <label for="slug">Slug personalizado</label>
-    </div>
-  </div>
+    gerar.onclick = async () => {
+      const numero = document.getElementById('numero').value;
+      const mensagem = document.getElementById('mensagem').value;
+      const slug = document.getElementById('slug').value;
 
-  <div class="row" style="display:flex;gap:12px;justify-content:center">
-    <button class="btn" id="gerar">Gerar</button>
-    <button class="btn" id="copiar" disabled>Copiar</button>
-  </div>
+      if (!numero || !mensagem || !slug) {
+        alert("Preencha todos os campos.");
+        return;
+      }
 
-  <pre id="resultado"></pre>
-</div>
+      const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
+      resultado.textContent = "⏳ Gerando link encurtado...";
+      resultado.classList.add('show');
+      copiar.disabled = true;
 
-<script>
-const gerar = document.getElementById('gerar');
-const copiar = document.getElementById('copiar');
-const resultado = document.getElementById('resultado');
+      try {
+        const res = await fetch("https://n8n.srv836207.hstgr.cloud/webhook/swiy-proxy", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url, slug })
+        });
 
-gerar.onclick = async () => {
-  const numero = document.getElementById('numero').value.trim();
-  const mensagem = document.getElementById('mensagem').value.trim();
-  const slug = document.getElementById('slug').value.trim();
+        const data = await res.json();
+        const shortUrl = data.short_url || "Erro ao gerar link.";
+        resultado.textContent = shortUrl;
+        copiar.disabled = false;
+      } catch (e) {
+        resultado.textContent = "❌ Erro na requisição ao webhook.";
+      }
+    };
 
-  if (!numero || !mensagem || !slug) {
-    alert('Preencha todos os campos.');
-    return;
-  }
-
-  const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
-  resultado.textContent = "⏳ Gerando link encurtado...";
-  resultado.classList.add('show');
-  copiar.disabled = true;
-
-  try {
-    const res = await fetch('https://n8n.srv836207.hstgr.cloud/webhook/swiy-proxy', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, slug })
-    });
-    const data = await res.json();
-    const shortUrl = data.link || data.short_url || "Erro ao gerar link.";
-    resultado.textContent = shortUrl;
-    copiar.disabled = false;
-  } catch (e) {
-    resultado.textContent = "❌ Erro na requisição ao webhook.";
-  }
-};
-
-copiar.onclick = () => {
-  const txt = resultado.textContent;
-  if (!txt) return;
-  navigator.clipboard.writeText(txt).then(() => {
-    copiar.textContent = "✓ Copiado!";
-    setTimeout(() => copiar.textContent = "Copiar", 1500);
-  }).catch(() => alert('Erro ao copiar'));
-};
-</script>
-
+    copiar.onclick = () => {
+      const txt = resultado.textContent;
+      if (!txt) return;
+      navigator.clipboard.writeText(txt).then(() => {
+        copiar.textContent = "✔ Copiado!";
+        setTimeout(() => copiar.textContent = "Copiar", 1500);
+      });
+    };
+  </script>
 </body>
 </html>
+
