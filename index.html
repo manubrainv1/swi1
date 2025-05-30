@@ -1,119 +1,154 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Gerador de Link WhatsApp + swiy.io</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f6f6f6;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      background: #fff;
+      font-family: 'Inter', Arial, sans-serif;
       margin: 0;
+      min-height: 100vh;
     }
-    .container {
-      background: white;
-      padding: 30px 40px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    .center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .card {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 6px 32px rgba(0,0,0,0.07);
+      padding: 32px 40px;
+      width: 370px;
+      max-width: 95vw;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .card h2 {
       text-align: center;
+      font-size: 1.35rem;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 1rem;
+      color: #5855cc;
+      margin-bottom: 18px;
+      font-weight: 500;
+    }
+    select, input {
       width: 100%;
-      max-width: 400px;
+      padding: 10px 8px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      margin-bottom: 7px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color .2s;
     }
-    h1 {
-      font-size: 18px;
-      margin-bottom: 20px;
+    select:focus, input:focus {
+      border-color: #6c63ff;
     }
-    select, input, button {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      font-size: 14px;
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin: 10px 0;
     }
-    button {
-      background-color: #5e4bdb;
-      color: white;
+    .btn {
+      flex: 1;
+      background: #6c63ff;
+      color: #fff;
       border: none;
+      border-radius: 7px;
+      padding: 10px 0;
+      font-weight: 600;
       cursor: pointer;
+      transition: background .18s;
     }
-    button:disabled {
-      background-color: #aaa;
-    }
-    #resultado {
-      background-color: #f1f1f1;
-      margin-top: 10px;
+    .btn:active { background: #4942db; }
+    .result {
+      background: #f2f3f7;
+      border-radius: 8px;
       padding: 10px;
       font-family: monospace;
-      font-size: 13px;
-      border-radius: 5px;
+      font-size: 0.96em;
+      margin-top: 6px;
+      word-break: break-all;
+      min-height: 28px;
+    }
+    @media (max-width: 480px) {
+      .card { padding: 18px 5vw; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Gerador de Link <br> WhatsApp + swiy.io</h1>
-    <select id="numero">
-      <option value="">Número de telefone</option>
-      <option value="5524981431724">Excellence Dental Academy</option>
-      <option value="5524981530500">Manu Arango</option>
-      <option value="5524981530501">Facial Academy</option>
-      <option value="5524981523330">Optical</option>
-    </select>
-    <input type="text" id="mensagem" placeholder="Mensagem personalizada"/>
-    <input type="text" id="slug" placeholder="Slug personalizado"/>
-    <button id="gerar">Gerar</button>
-    <button id="copiar" disabled>Copiar</button>
-    <div id="resultado"></div>
+  <div class="center">
+    <div class="card">
+      <h2>Gerador de Link<br>WhatsApp + swiy.io</h2>
+      <div class="subtitle">Personalize seu link</div>
+      <label>Número de telefone</label>
+      <select id="numero">
+        <option value="">Selecione</option>
+        <option value="5524981431724">Excellence Dental Academy</option>
+        <option value="5561999999999">Manu Arango</option>
+        <!-- Adicione outros contatos aqui -->
+      </select>
+      <label>Mensagem personalizada</label>
+      <input id="mensagem" type="text" placeholder="Digite a mensagem (opcional)">
+      <label>Slug personalizado</label>
+      <input id="slug" type="text" placeholder="Ex: meu-link-unico">
+      <div class="btn-row">
+        <button class="btn" id="gerar">Gerar</button>
+        <button class="btn" id="copiar">Copiar</button>
+      </div>
+      <div class="result" id="resultado">Seu link aparecerá aqui.</div>
+    </div>
   </div>
-
   <script>
     const gerar = document.getElementById('gerar');
     const copiar = document.getElementById('copiar');
     const resultado = document.getElementById('resultado');
+    const numero = document.getElementById('numero');
+    const mensagem = document.getElementById('mensagem');
+    const slug = document.getElementById('slug');
 
-    gerar.onclick = async () => {
-      const numero = document.getElementById('numero').value;
-      const mensagem = document.getElementById('mensagem').value;
-      const slug = document.getElementById('slug').value;
-
-      if (!numero || !mensagem || !slug) {
-        alert("Preencha todos os campos.");
+    // Função para gerar o link WhatsApp
+    function gerarLinkWhatsApp() {
+      const num = numero.value.trim();
+      const msg = mensagem.value.trim();
+      const slugVal = slug.value.trim();
+      if (!num) {
+        resultado.textContent = "Selecione o número de telefone.";
         return;
       }
-
-      const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
-      resultado.textContent = "⏳ Gerando link encurtado...";
-      resultado.classList.add('show');
-      copiar.disabled = true;
-
-      try {
-        const res = await fetch("https://n8n.srv836207.hstgr.cloud/webhook/swiy-proxy", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url, slug })
-        });
-
-        const data = await res.json();
-        const shortUrl = data.short_url || "Erro ao gerar link.";
-        resultado.textContent = shortUrl;
-        copiar.disabled = false;
-      } catch (e) {
-        resultado.textContent = "❌ Erro na requisição ao webhook.";
+      let url = `https://wa.me/${num}`;
+      if (msg) {
+        url += `?text=${encodeURIComponent(msg)}`;
       }
-    };
+      // Slug personalizado (simulação, pois não há encurtador para wa.me)
+      let linkFinal = url;
+      if (slugVal) {
+        linkFinal += `#${encodeURIComponent(slugVal)}`;
+      }
+      resultado.textContent = linkFinal;
+    }
 
+    // Função para copiar
     copiar.onclick = () => {
       const txt = resultado.textContent;
-      if (!txt) return;
+      if (!txt || txt === "Seu link aparecerá aqui." || txt.startsWith("Selecione")) return;
       navigator.clipboard.writeText(txt).then(() => {
-        copiar.textContent = "✔ Copiado!";
-        setTimeout(() => copiar.textContent = "Copiar", 1500);
+        copiar.textContent = "Copiado!";
+        setTimeout(() => { copiar.textContent = "Copiar"; }, 1300);
       });
     };
+
+    gerar.onclick = gerarLinkWhatsApp;
   </script>
 </body>
 </html>
-
